@@ -1,0 +1,26 @@
+Please find below all the credentials related to the superuser and users I created :
+
+SUPERUSER:
+- Username: admin
+- Email: admin@littlelemon.com
+- Password: lemon@789!
+- Token : e0380ea12178278b693f3728aa74db413f031591
+
+Username: Adrian
+Email: adrian@littlelemon.com
+Password: lemon@adr!
+Role : MANAGER
+Token : 15080bf077ca1b88f769b3cf5bad9deafd35d794
+
+
+Username: Mario
+Email: mario@littlelemon.com
+Password: lemon@mar!
+ROLE : DELIVERY
+Token : d002dffc1dfbaeaaf7aa81ca245622320617e9a7
+
+Username: Sana
+Email: sana@littlelemon.com
+Password: lemon@san!
+ROLE : CUSTOMER
+Token : 99ac88a653776444980e6ed26539eaee05a07c25
