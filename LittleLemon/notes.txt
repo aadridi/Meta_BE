@@ -24,3 +24,8 @@ Email: sana@littlelemon.com
 Password: lemon@san!
 ROLE : CUSTOMER
 Token : 99ac88a653776444980e6ed26539eaee05a07c25
+
+Username: Test
+Email: test@gmail.com
+Password: test@123!
+Role: USER/CUSTOMER

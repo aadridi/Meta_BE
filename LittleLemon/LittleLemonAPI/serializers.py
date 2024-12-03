@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import Category, MenuItem, Cart
+from .models import Category, MenuItem, Cart, Order, OrderItem
+from django.contrib.auth.models import User
+
+
+class ManagerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
 
 
 class CategorySerializer (serializers.ModelSerializer):
@@ -21,7 +28,31 @@ class MenuItemSerializer(serializers.ModelSerializer):
 
 
 class CartSerializer(serializers.ModelSerializer):
+    price = serializers.SerializerMethodField(method_name='calculate_price')
+    unit_price = serializers.DecimalField(
+        max_digits=6, decimal_places=2, read_only=True)
+    menuitem = serializers.PrimaryKeyRelatedField(
+        queryset=MenuItem.objects.all())
+    menuitem_details = MenuItemSerializer(
+        source='menuitem', read_only=True)
+
+    def calculate_price(self, cart):
+        return cart.quantity * cart.unit_price
+
+    def create(self, validated_data):
+        menuitem = validated_data.get('menuitem')
+        validated_data['unit_price'] = menuitem.price
+        validated_data['price'] = validated_data['quantity'] * menuitem.price
+        return super().create(validated_data)
+
     class Meta:
         model = Cart
-        fields = ['id', 'user', 'menuitem', 'quantity', 'unit_price', 'price']
-        depth = 1
+        fields = ['id', 'user', 'menuitem', 'menuitem_details',
+                  'quantity', 'unit_price', 'price']
+        # depth = 1
+
+
+class OrdersSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date']
