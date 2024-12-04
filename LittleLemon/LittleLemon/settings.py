@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "django_filters",
     "LittleLemonAPI",
     "rest_framework.authtoken",
     "djoser",
@@ -131,15 +132,24 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ],
-    # 'DEFAULT_FILTER_BACKENDS': [
-    # 'django_filters.rest_framework.DjangoFilterBackend',
-    # 'rest_framework.filters.OrderingFilter',
-    # 'rest_framework.filters.SearchFilter'
-    # ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',
+        'rest_framework.filters.SearchFilter'
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
-        # Par défaut, l'accès nécessite l'authentification
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.UserRateThrottle',
+        'rest_framework.throttling.AnonRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user': '100/hour',
+        'anon': '10/minute',
+    },
 }
 
 DJOSER = {

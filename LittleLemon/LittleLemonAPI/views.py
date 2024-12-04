@@ -4,6 +4,8 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from .permissions import IsManager, IsCustomer
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import OrderingFilter, SearchFilter
 # from django.core.exceptions import PermissionDenied
 
 
@@ -114,6 +116,10 @@ class MenuItemsView(generics.ListCreateAPIView):
     queryset = MenuItem.objects.all()
     serializer_class = MenuItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    filter_backends = [DjangoFilterBackend, OrderingFilter, SearchFilter]
+    filterset_fields = ['category', 'price']
+    search_fields = ['name', 'description']
+    ordering_fields = ['price', 'name']
 
     def create(self, request, *args, **kwargs):
         if not request.user.has_perm('LittleLemonAPI.add_menuitem'):
@@ -152,6 +158,9 @@ class CartView(generics.ListCreateAPIView):
 class OrdersView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = OrderSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ['status', 'delivery_crew', 'user', 'date']
+    ordering_fields = ['total', 'date']
 
     def get_queryset(self):
         user = self.request.user
