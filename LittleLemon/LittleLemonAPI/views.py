@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .serializers import MenuItemSerializer, CartSerializer, OrdersSerializer, ManagerSerializer
+from .serializers import MenuItemSerializer, CartSerializer, OrdersSerializer, ManagerGetSerializer, ManagerCreateSerializer
 from .models import MenuItem, Cart, Order, OrderItem
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
@@ -9,12 +9,68 @@ from .permissions import IsManager
 
 # Create your views here.
 class ManagersView(generics.ListCreateAPIView):
-    serializer_class = ManagerSerializer
     permission_classes = [permissions.IsAuthenticated, IsManager]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return ManagerCreateSerializer
+        return ManagerGetSerializer
 
     def get_queryset(self):
         manager_group = Group.objects.get(name='Manager')
         return manager_group.user_set.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data['username']
+
+        user = User.objects.get(username=username)
+        manager_group, created = Group.objects.get_or_create(name='Manager')
+        if user in manager_group.user_set.all():
+            return Response(
+                {"message": f"User '{username}' is already a manager"},
+                status=status.HTTP_200_OK,
+            )
+        manager_group.user_set.add(user)
+
+        return Response(
+            {"message": f"User '{username}' has been added to the Manager group"},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class DeliveryCrewView(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAuthenticated, IsManager]
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return ManagerCreateSerializer
+        return ManagerGetSerializer
+
+    def get_queryset(self):
+        delivery_team_group = Group.objects.get(name='Delivery Team')
+        return delivery_team_group.user_set.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        username = serializer.validated_data['username']
+
+        user = User.objects.get(username=username)
+        delivery_team_group, created = Group.objects.get_or_create(
+            name='Delivery Team')
+        if user in delivery_team_group.user_set.all():
+            return Response(
+                {"message": f"User '{username}' is already part of the delivery team"},
+                status=status.HTTP_200_OK,
+            )
+        delivery_team_group.user_set.add(user)
+
+        return Response(
+            {"message": f"User '{username}' has been added to the Manager group"},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 class MenuItemsView(generics.ListCreateAPIView):

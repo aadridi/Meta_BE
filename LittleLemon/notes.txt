@@ -29,3 +29,8 @@ Username: Test
 Email: test@gmail.com
 Password: test@123!
 Role: USER/CUSTOMER
+
+Username: Jean-Claude Van Damne
+Email: jcvd@littlelemon.com
+Password: admin@789!
+Role: USER/CUSTOMER

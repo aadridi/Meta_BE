@@ -3,10 +3,36 @@ from .models import Category, MenuItem, Cart, Order, OrderItem
 from django.contrib.auth.models import User
 
 
-class ManagerSerializer(serializers.ModelSerializer):
+class ManagerGetSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'username', 'email']
+
+
+class ManagerCreateSerializer(serializers.Serializer):
+    username = serializers.CharField()
+
+    def validate_username(self, value):
+        if not User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                f"User with username '{value}' does not exist.")
+        return value
+
+
+class DeliveryCrewGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email']
+
+
+class DeliveryCrewCreateSerializer(serializers.Serializer):
+    username = serializers.CharField()
+
+    def validate_username(self, value):
+        if not User.objects.filter(username=value).exists():
+            raise serializers.ValidationError(
+                f"User with username '{value}' does not exist.")
+        return value
 
 
 class CategorySerializer (serializers.ModelSerializer):
