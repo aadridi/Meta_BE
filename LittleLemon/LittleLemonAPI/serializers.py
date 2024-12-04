@@ -59,26 +59,42 @@ class CartSerializer(serializers.ModelSerializer):
         max_digits=6, decimal_places=2, read_only=True)
     menuitem = serializers.PrimaryKeyRelatedField(
         queryset=MenuItem.objects.all())
-    menuitem_details = MenuItemSerializer(
-        source='menuitem', read_only=True)
-
-    def calculate_price(self, cart):
-        return cart.quantity * cart.unit_price
-
-    def create(self, validated_data):
-        menuitem = validated_data.get('menuitem')
-        validated_data['unit_price'] = menuitem.price
-        validated_data['price'] = validated_data['quantity'] * menuitem.price
-        return super().create(validated_data)
+    menuitem_details = MenuItemSerializer(source='menuitem', read_only=True)
 
     class Meta:
         model = Cart
         fields = ['id', 'user', 'menuitem', 'menuitem_details',
                   'quantity', 'unit_price', 'price']
-        # depth = 1
+        read_only_fields = ['user', 'unit_price', 'price']
+
+    def calculate_price(self, cart):
+        return cart.quantity * cart.unit_price
+
+    def create(self, validated_data):
+        menuitem = validated_data['menuitem']
+        validated_data['unit_price'] = menuitem.price
+        validated_data['price'] = validated_data['quantity'] * menuitem.price
+        return super().create(validated_data)
 
 
-class OrdersSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.ModelSerializer):
+    menuitem_details = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'menuitem', 'menuitem_details',
+                  'quantity', 'unit_price', 'price']
+
+    def get_menuitem_details(self, obj):
+        return {"name": obj.menuitem.name, "description": obj.menuitem.description}
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(
+        many=True, read_only=True, source='orderitem_set')
+
     class Meta:
         model = Order
-        fields = ['id', 'user', 'delivery_crew', 'status', 'total', 'date']
+        fields = ['id', 'user', 'delivery_crew',
+                  'status', 'total', 'date', 'items']
+        read_only_fields = ['user', 'total', 'date']
